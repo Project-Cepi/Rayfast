@@ -27,6 +27,9 @@ dependencies {
     // Use the Kotlin reflect library.
     compileOnly(kotlin("reflect"))
 
+    // Use jetbrain's annotations
+    compileOnly("org.jetbrains:annotations:22.0.0")
+
     // Use the JUpiter test library.
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
 }

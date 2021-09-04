@@ -3,6 +3,7 @@ package dev.emortal.rayfast.grid
 import kotlin.jvm.JvmOverloads
 import dev.emortal.rayfast.grid.GridCast.GridIterator
 import dev.emortal.rayfast.grid.GridCast.ExactGridIterator
+import org.jetbrains.annotations.Contract
 import kotlin.math.abs
 
 object GridCast {
@@ -22,6 +23,7 @@ object GridCast {
      */
     @JvmStatic
     @JvmOverloads
+    @Contract(pure = true)
     fun createGridIterator(
         startX: Double,
         startY: Double,
@@ -50,6 +52,7 @@ object GridCast {
      * @param length the maximum length of the iterator
      * @return the iterator
      */
+    @Contract(pure = true)
     fun createExactGridIterator(
         startX: Double,
         startY: Double,
@@ -80,12 +83,12 @@ object GridCast {
 
         override fun next(): DoubleArray {
             // Find the length to the next block
-            val lengthX = (gridSize - Math.abs(posX) % gridSize) / Math.abs(dirX)
-            val lengthY = (gridSize - Math.abs(posY) % gridSize) / Math.abs(dirY)
-            val lengthZ = (gridSize - Math.abs(posZ) % gridSize) / Math.abs(dirZ)
+            val lengthX = (gridSize - abs(posX) % gridSize) / abs(dirX)
+            val lengthY = (gridSize - abs(posY) % gridSize) / abs(dirY)
+            val lengthZ = (gridSize - abs(posZ) % gridSize) / abs(dirZ)
 
             // Find the lowest of all
-            val lowest = Math.min(lengthX, Math.min(lengthY, lengthZ))
+            val lowest = lengthX.coerceAtMost(lengthY.coerceAtMost(lengthZ))
 
             // Cast to the next block
             posX += dirX * lowest

@@ -1,6 +1,6 @@
 package dev.emortal.rayfast.util
 
-import dev.emortal.rayfast.util.IntersectionUtils
+import org.jetbrains.annotations.ApiStatus
 
 /**
  * Internal Intersection Utils.
@@ -8,7 +8,7 @@ import dev.emortal.rayfast.util.IntersectionUtils
  * INTERNAL ONLY.
  * If any issues arise using this class, that's on you.
  */
-@Deprecated("Internal ONLY")
+@ApiStatus.Internal
 object IntersectionUtils {
     fun forwardPlaneIntersection( // Line
         posX: Double, posY: Double, posZ: Double,  // Position vector
@@ -41,24 +41,24 @@ object IntersectionUtils {
         adjX: Double, adjY: Double, adjZ: Double,
         maxX: Double, maxY: Double, maxZ: Double
     ): DoubleArray? {
-        val arr = getIntersection(
+        val point = getIntersection(
             posX, posY, posZ,
             dirX, dirY, dirZ,
             minX, minY, minZ,
             adjX, adjY, adjZ,
             maxX, maxY, maxZ
         )
-        val x = arr[0]
-        val y = arr[1]
-        val z = arr[2]
+
+        val (x, y, z) = point
         var fits = 0
-        if (minX != maxX && isBetweenUnordered(x, minX, maxX)) {
+
+        if (minX != maxX && x in minX..maxX) {
             fits++
         }
-        if (minY != maxY && isBetweenUnordered(y, minY, maxY)) {
+        if (minY != maxY && y in minY..maxY) {
             fits++
         }
-        if (minZ != maxZ && isBetweenUnordered(z, minZ, maxZ)) {
+        if (minZ != maxZ && z in minZ..maxZ) {
             fits++
         }
         return if (fits < 2) {
@@ -66,15 +66,8 @@ object IntersectionUtils {
         } else doubleArrayOf(x, y, z)
     }
 
-    fun isBetween(number: Double, min: Double, max: Double): Boolean {
-        return number in min..max
-    }
-
-    fun isBetweenUnordered(number: Double, compare1: Double, compare2: Double): Boolean {
-        return if (compare1 > compare2) {
-            isBetween(number, compare2, compare1)
-        } else isBetween(number, compare1, compare2)
-    }
+    fun isBetweenUnordered(number: Double, compare1: Double, compare2: Double) =
+        number in compare1..compare2
 
     /**
      * Gets the intersections of the specified line with the specified planes
@@ -126,7 +119,7 @@ object IntersectionUtils {
         // Plane
         planeX: Double, planeY: Double, planeZ: Double,  // Plane point
         planeDirX: Double, planeDirY: Double, planeDirZ: Double // Plane normal
-    ): DoubleArray {
+    ): Point {
         // Sensitive (speed oriented) code:
         val dotA = planeDirX * planeX + planeDirY * planeY + planeDirZ * planeZ
         val dotB = planeDirX * posX + planeDirY * posY + planeDirZ * posZ
@@ -135,7 +128,7 @@ object IntersectionUtils {
         val x = posX + dirX * t
         val y = posY + dirY * t
         val z = posZ + dirZ * t
-        return doubleArrayOf(x, y, z)
+        return Point(x, y, z)
     }
 
     private fun getDot(
@@ -152,7 +145,7 @@ object IntersectionUtils {
         minX: Double, minY: Double, minZ: Double,
         adjX: Double, adjY: Double, adjZ: Double,
         maxX: Double, maxY: Double, maxZ: Double
-    ): DoubleArray {
+    ): Point {
         val v1x = minX - adjX
         val v1y = minY - adjY
         val v1z = minZ - adjZ

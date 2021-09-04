@@ -1,8 +1,5 @@
 package dev.emortal.rayfast.area.area3d
 
-import dev.emortal.rayfast.area.area3d.Area3d
-import java.util.function.IntFunction
-import dev.emortal.rayfast.area.area3d.Area3d.Area3dCombined
 import dev.emortal.rayfast.util.Converter
 
 /**
