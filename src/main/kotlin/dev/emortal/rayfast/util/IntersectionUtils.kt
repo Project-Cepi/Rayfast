@@ -11,59 +11,59 @@ import org.jetbrains.annotations.ApiStatus
 @ApiStatus.Internal
 object IntersectionUtils {
     fun forwardPlaneIntersection( // Line
-        posX: Double, posY: Double, posZ: Double,  // Position vector
-        dirX: Double, dirY: Double, dirZ: Double,  // Direction vector
+        pos: Point,  // Position vector
+        dir: Point,  // Direction vector
         // Plane
-        minX: Double, minY: Double, minZ: Double,
-        adjX: Double, adjY: Double, adjZ: Double,
-        maxX: Double, maxY: Double, maxZ: Double
-    ): DoubleArray? {
-        val pos = planeIntersection(
-            posX, posY, posZ,
-            dirX, dirY, dirZ,
-            minX, minY, minZ,
-            adjX, adjY, adjZ,
-            maxX, maxY, maxZ
+        min: Point,
+        adj: Point,
+        max: Point
+    ): Point? {
+        val posIntersection = planeIntersection(
+            pos,
+            dir,
+            min,
+            adj,
+            max
         ) ?: return null
 
         // Check if position is forwards
-        val dotProduct = dirX * (pos[0] - posX) + dirY * (pos[1] - posY) + dirZ * (pos[2] - posZ)
+        val dotProduct = dir.x * (posIntersection.x - pos.x) + dir.y * (posIntersection.y - pos.y) + dir.z * (posIntersection.z - pos.z)
         return if (dotProduct > 0) {
             pos
         } else null
     }
 
     fun planeIntersection( // Line
-        posX: Double, posY: Double, posZ: Double,  // Position vector
-        dirX: Double, dirY: Double, dirZ: Double,  // Direction vector
+        pos: Point,  // Position vector
+        dir: Point,  // Direction vector
         // Plane
-        minX: Double, minY: Double, minZ: Double,
-        adjX: Double, adjY: Double, adjZ: Double,
-        maxX: Double, maxY: Double, maxZ: Double
-    ): DoubleArray? {
+        min: Point,
+        adj: Point,
+        max: Point
+    ): Point? {
         val point = getIntersection(
-            posX, posY, posZ,
-            dirX, dirY, dirZ,
-            minX, minY, minZ,
-            adjX, adjY, adjZ,
-            maxX, maxY, maxZ
+            pos,
+            dir,
+            min,
+            adj,
+            max
         )
 
         val (x, y, z) = point
         var fits = 0
 
-        if (minX != maxX && x in minX..maxX) {
+        if (min.x != max.x && x in min.x..max.x) {
             fits++
         }
-        if (minY != maxY && y in minY..maxY) {
+        if (min.y != max.y && y in min.y..max.y) {
             fits++
         }
-        if (minZ != maxZ && z in minZ..maxZ) {
+        if (min.z != max.z && z in min.z..max.z) {
             fits++
         }
         return if (fits < 2) {
             null
-        } else doubleArrayOf(x, y, z)
+        } else Point(x, y, z)
     }
 
     /**
@@ -88,38 +88,38 @@ object IntersectionUtils {
      * @return Array of intersection positions.
      */
     fun intersectPlanes( // Line
-        posX: Double, posY: Double, posZ: Double,  // Position vector
-        dirX: Double, dirY: Double, dirZ: Double,  // Direction vector
+        pos: Point,  // Position vector
+        dir: Point,  // Direction vector
         // Planes
-        vararg planes: DoubleArray
+        vararg planes: Array<Point>
     ) = Array(planes.size) {
         val plane = planes[it]
 
         getIntersection( // Line
-            posX, posY, posZ,
-            dirX, dirY, dirZ,  // Plane
-            plane[0], plane[1], plane[2],
-            plane[3], plane[4], plane[5],
-            plane[6], plane[7], plane[8]
+            pos,
+            dir,  // Plane
+            plane[0],
+            plane[1],
+            plane[2]
         )
     }
 
 
     fun getIntersection( // Line
-        posX: Double, posY: Double, posZ: Double,  // Position vector
-        dirX: Double, dirY: Double, dirZ: Double,  // Direction vector
+        pos: Point,  // Position vector
+        dir: Point,  // Direction vector
         // Plane
-        planeX: Double, planeY: Double, planeZ: Double,  // Plane point
-        planeDirX: Double, planeDirY: Double, planeDirZ: Double // Plane normal
+        plane: Point,  // Plane point
+        planeDir: Point // Plane normal
     ): Point {
         // Sensitive (speed oriented) code:
-        val dotA = planeDirX * planeX + planeDirY * planeY + planeDirZ * planeZ
-        val dotB = planeDirX * posX + planeDirY * posY + planeDirZ * posZ
-        val dotC = planeDirX * dirX + planeDirY * dirY + planeDirZ * dirZ
+        val dotA = planeDir.x * plane.x + planeDir.y * plane.y + planeDir.z * plane.z
+        val dotB = planeDir.x * pos.x + planeDir.y * pos.y + planeDir.z * pos.z
+        val dotC = planeDir.x * dir.x + planeDir.y * dir.y + planeDir.z * dir.z
         val t = (dotA - dotB) / dotC
-        val x = posX + dirX * t
-        val y = posY + dirY * t
-        val z = posZ + dirZ * t
+        val x = pos.x + dir.x * t
+        val y = pos.y + dir.y * t
+        val z = pos.z + dir.z * t
         return Point(x, y, z)
     }
 
@@ -131,27 +131,27 @@ object IntersectionUtils {
     }
 
     fun getIntersection( // Line
-        posX: Double, posY: Double, posZ: Double,  // Position vector
-        dirX: Double, dirY: Double, dirZ: Double,  // Direction vector
+        pos: Point,  // Position vector
+        dir: Point,  // Direction vector
         // Plane
-        minX: Double, minY: Double, minZ: Double,
-        adjX: Double, adjY: Double, adjZ: Double,
-        maxX: Double, maxY: Double, maxZ: Double
+        min: Point,
+        adj: Point,
+        max: Point
     ): Point {
-        val v1x = minX - adjX
-        val v1y = minY - adjY
-        val v1z = minZ - adjZ
-        val v2x = minX - maxX
-        val v2y = minY - maxY
-        val v2z = minZ - maxZ
+        val v1x = min.x - adj.x
+        val v1y = min.y - adj.y
+        val v1z = min.z - adj.z
+        val v2x = min.x - max.x
+        val v2y = min.y - max.y
+        val v2z = min.z - max.z
         val crossX = v1y * v2z - v2y * v1z
         val crossY = v1z * v2x - v2z * v1x
         val crossZ = v1x * v2y - v2x * v1y
         return getIntersection( // Line
-            posX, posY, posZ,
-            dirX, dirY, dirZ,  // Plane
-            minX, minY, minZ,
-            crossX, crossY, crossZ
+            pos,
+            dir,  // Plane
+            min,
+            Point(crossX, crossY, crossZ)
         )
 
         // TODO: fix this (faster) method

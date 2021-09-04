@@ -1,35 +1,27 @@
 package dev.emortal.rayfast.area.area3d
 
 import dev.emortal.rayfast.util.IntersectionUtils
-import java.util.function.Function
+import dev.emortal.rayfast.util.Point
 
 /**
  * A static rectangular prism class
  */
 interface Area3dRectangularPrism : Area3d {
     // Coordinates
-    val minX: Double
-    val minY: Double
-    val minZ: Double
-    val maxX: Double
-    val maxY: Double
-    val maxZ: Double
+    val min: Point
+    val max: Point
     override fun lineIntersection(
-        posX: Double,
-        posY: Double,
-        posZ: Double,
-        dirX: Double,
-        dirY: Double,
-        dirZ: Double
-    ): DoubleArray? {
+        pos: Point,
+        dir: Point
+    ): Point? {
         run {
             // Front
             val intersection = IntersectionUtils.forwardPlaneIntersection( // Line
-                posX, posY, posZ,
-                dirX, dirY, dirZ,  // Plane
-                minX, minY, minZ,
-                minX, maxY, minZ,
-                maxX, maxY, minZ
+                pos,
+                dir,  // Plane
+                Point(min.x, min.y, min.z),
+                Point(min.x, max.y, min.z),
+                Point(max.x, max.y, min.z)
             )
             if (intersection != null) {
                 return intersection
@@ -38,11 +30,11 @@ interface Area3dRectangularPrism : Area3d {
         run {
             // Back
             val intersection = IntersectionUtils.forwardPlaneIntersection( // Line
-                posX, posY, posZ,
-                dirX, dirY, dirZ,  // Plane
-                minX, minY, maxZ,
-                minX, maxY, maxZ,
-                maxX, maxY, maxZ
+                pos,
+                dir,  // Plane
+                Point(min.x, min.y, max.z),
+                Point(min.x, max.y, max.z),
+                Point(max.x, max.y, max.z)
             )
             if (intersection != null) {
                 return intersection
@@ -51,11 +43,11 @@ interface Area3dRectangularPrism : Area3d {
         run {
             // Left
             val intersection = IntersectionUtils.forwardPlaneIntersection( // Line
-                posX, posY, posZ,
-                dirX, dirY, dirZ,  // Plane
-                minX, minY, minZ,
-                minX, maxY, minZ,
-                minX, maxY, maxZ
+                pos,
+                dir,  // Plane
+                Point(min.x, min.y, min.z),
+                Point(min.x, max.y, min.z),
+                Point(min.x, max.y, max.z)
             )
             if (intersection != null) {
                 return intersection
@@ -64,11 +56,11 @@ interface Area3dRectangularPrism : Area3d {
         run {
             // Right
             val intersection = IntersectionUtils.forwardPlaneIntersection( // Line
-                posX, posY, posZ,
-                dirX, dirY, dirZ,  // Plane
-                maxX, minY, minZ,
-                maxX, maxY, minZ,
-                maxX, maxY, maxZ
+                pos,
+                dir,  // Plane
+                Point(max.x, min.y, min.z),
+                Point(max.x, max.y, min.z),
+                Point(max.x, max.y, max.z)
             )
             if (intersection != null) {
                 return intersection
@@ -77,11 +69,11 @@ interface Area3dRectangularPrism : Area3d {
         run {
             // Top
             val intersection = IntersectionUtils.forwardPlaneIntersection( // Line
-                posX, posY, posZ,
-                dirX, dirY, dirZ,  // Plane
-                minX, maxY, minZ,
-                maxX, maxY, minZ,
-                maxX, maxY, maxZ
+                pos,
+                dir,  // Plane
+                Point(min.x, max.y, min.z),
+                Point(max.x, max.y, min.z),
+                Point(max.x, max.y, max.z)
             )
             if (intersection != null) {
                 return intersection
@@ -89,11 +81,11 @@ interface Area3dRectangularPrism : Area3d {
         }
         run { // Bottom
             return IntersectionUtils.forwardPlaneIntersection( // Line
-                posX, posY, posZ,
-                dirX, dirY, dirZ,  // Plane
-                minX, minY, minZ,
-                maxX, minY, minZ,
-                maxX, minY, maxZ
+                pos,
+                dir,  // Plane
+                Point(min.x, min.y, min.z),
+                Point(max.x, min.y, min.z),
+                Point(max.x, min.y, max.z)
             )
         }
     }
@@ -106,39 +98,21 @@ interface Area3dRectangularPrism : Area3d {
          * Area3dRectangularPrism interface directly on the object.
          *
          * @param object the object to wrap
-         * @param minXGetter the getter for minX
-         * @param minYGetter the getter for minY
-         * @param minZGetter the getter for minZ
-         * @param maxXGetter the getter for maxX
-         * @param maxYGetter the getter for maxY
-         * @param maxZGetter the getter for maxZ
+         * @param minGetter the getter for min
+         * @param maxGetter the getter for max
          * @param <T> the type of the wrapper
          * @return the area that is represented by this wrapped
         </T> */
         @JvmStatic
-        fun <T> wrapper(
+        inline fun <T> wrapper(
             `object`: T,
-            minXGetter: Function<T, Double>,
-            minYGetter: Function<T, Double>,
-            minZGetter: Function<T, Double>,
-            maxXGetter: Function<T, Double>,
-            maxYGetter: Function<T, Double>,
-            maxZGetter: Function<T, Double>
-        ): Area3dRectangularPrism {
-            return object : Area3dRectangularPrism {
-                override val minX: Double
-                    get() = minXGetter.apply(`object`)
-                override val minY: Double
-                    get() = minYGetter.apply(`object`)
-                override val minZ: Double
-                    get() = minZGetter.apply(`object`)
-                override val maxX: Double
-                    get() = maxXGetter.apply(`object`)
-                override val maxY: Double
-                    get() = maxYGetter.apply(`object`)
-                override val maxZ: Double
-                    get() = maxZGetter.apply(`object`)
-            }
+            crossinline minGetter: (T) -> Point,
+            crossinline maxGetter: (T) -> Point,
+        ) = object : Area3dRectangularPrism {
+            override val min: Point
+                get() = minGetter(`object`)
+            override val max: Point
+                get() = maxGetter(`object`)
         }
     }
 }

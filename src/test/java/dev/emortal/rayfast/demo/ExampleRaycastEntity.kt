@@ -1,8 +1,7 @@
 package dev.emortal.rayfast.demo
 
-import dev.emortal.rayfast.demo.ExampleRaycastEntity.BoundingBox
-import dev.emortal.rayfast.demo.ExampleRaycastEntity
 import dev.emortal.rayfast.area.area3d.Area3dRectangularPrism
+import dev.emortal.rayfast.util.Point
 
 /**
  * An example usage of an entity with a bounding box.
@@ -29,18 +28,18 @@ abstract class ExampleRaycastEntity {
         private val halfDepth: Double = depth / 2.0
 
         // Coordinates
-        override val minX: Double
-            get() = exampleRaycastEntity.x - halfWidth
-        override val minY: Double
-            get() = exampleRaycastEntity.y - halfHeight
-        override val minZ: Double
-            get() = exampleRaycastEntity.z - halfDepth
-        override val maxX: Double
-            get() = exampleRaycastEntity.x + halfWidth
-        override val maxY: Double
-            get() = exampleRaycastEntity.y + halfHeight
-        override val maxZ: Double
-            get() = exampleRaycastEntity.z + halfDepth
+        override val min: Point
+            get() = Point(
+                exampleRaycastEntity.x - halfWidth,
+                exampleRaycastEntity.y - halfHeight,
+                exampleRaycastEntity.z - halfDepth
+            )
+        override val max: Point
+            get() = Point(
+                exampleRaycastEntity.x + halfWidth,
+                exampleRaycastEntity.y + halfHeight,
+                exampleRaycastEntity.z + halfDepth
+            )
 
     }
 }

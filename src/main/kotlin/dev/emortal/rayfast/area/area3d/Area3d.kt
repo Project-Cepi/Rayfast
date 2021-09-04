@@ -1,6 +1,7 @@
 package dev.emortal.rayfast.area.area3d
 
 import dev.emortal.rayfast.util.Converter
+import dev.emortal.rayfast.util.Point
 
 /**
  * Specifies an object that represents some arbitrary 3d area.
@@ -9,50 +10,34 @@ interface Area3d {
     /**
      * Returns the intersection between the specified line and this object.
      *
-     * @param posX line X position
-     * @param posY line Y position
-     * @param posZ line Z position
-     * @param dirX line X direction
-     * @param dirY line Y direction
-     * @param dirZ line Z direction
+     * @param pos line position
+     * @param dir line direction
      * @return the computed line intersection position, null if none
      */
     fun lineIntersection(
-        posX: Double,
-        posY: Double,
-        posZ: Double,
-        dirX: Double,
-        dirY: Double,
-        dirZ: Double
-    ): DoubleArray?
+        pos: Point,
+        dir: Point
+    ): Point?
 
     /**
      * Returns true if the specified line intersects this object.
      *
-     * @param posX line X position
-     * @param posY line Y position
-     * @param posZ line Z position
-     * @param dirX line X direction
-     * @param dirY line Y direction
-     * @param dirZ line Z direction
+     * @param pos line position
+     * @param dir line direction
      * @return the computed line intersection position, null if none
      */
-    fun lineIntersects(posX: Double, posY: Double, posZ: Double, dirX: Double, dirY: Double, dirZ: Double): Boolean {
-        return lineIntersection(posX, posY, posZ, dirX, dirY, dirZ) != null
+    fun lineIntersects(pos: Point, dir: Point): Boolean {
+        return lineIntersection(pos, dir) != null
     }
 
     class Area3dCombined(vararg val all: Area3d) : Area3d {
 
         override fun lineIntersection(
-            posX: Double,
-            posY: Double,
-            posZ: Double,
-            dirX: Double,
-            dirY: Double,
-            dirZ: Double
-        ): DoubleArray? {
+            pos: Point,
+            dir: Point
+        ): Point? {
             for (area3d in all) {
-                val intersection = area3d.lineIntersection(posX, posY, posZ, dirX, dirY, dirZ)
+                val intersection = area3d.lineIntersection(pos, dir)
                 if (intersection != null) {
                     return intersection
                 }

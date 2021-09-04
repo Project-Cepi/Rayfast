@@ -3,6 +3,7 @@ package dev.emortal.rayfast.demo;
 import dev.emortal.rayfast.area.area3d.Area3d;
 import dev.emortal.rayfast.area.area3d.Area3dRectangularPrism;
 import dev.emortal.rayfast.grid.GridCast;
+import dev.emortal.rayfast.util.Point;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -56,12 +57,8 @@ public class RunBenchmarks {
 
         Arrays.fill(wrappers, Area3dRectangularPrism.wrapper(
                 exampleRaycastEntity.getBoundingBox(),
-                ExampleRaycastEntity.BoundingBox::getMinX,
-                ExampleRaycastEntity.BoundingBox::getMinY,
-                ExampleRaycastEntity.BoundingBox::getMinZ,
-                ExampleRaycastEntity.BoundingBox::getMaxX,
-                ExampleRaycastEntity.BoundingBox::getMaxY,
-                ExampleRaycastEntity.BoundingBox::getMaxZ
+                ExampleRaycastEntity.BoundingBox::getMin,
+                ExampleRaycastEntity.BoundingBox::getMax
         ));
 
         wrapperCombined = Area3d.combined(wrappers);
@@ -99,8 +96,8 @@ public class RunBenchmarks {
 
             for (int i = 0; i < 100_000; i++)
                 interfacedCombined.lineIntersection(
-                        Math.random(), Math.random(), Math.random(),
-                        Math.random(), Math.random(), Math.random()
+                        Point.generate(Math::random),
+                        Point.generate(Math::random)
                 );
 
             System.out.println("took " + (System.currentTimeMillis() - millis) + "ms to intersect 100 mil interfaced rectangular prisms");
@@ -111,8 +108,8 @@ public class RunBenchmarks {
 
             for (int i = 0; i < 100_000; i++)
                 wrapperCombined.lineIntersection(
-                        Math.random(), Math.random(), Math.random(),
-                        Math.random(), Math.random(), Math.random()
+                        Point.generate(Math::random),
+                        Point.generate(Math::random)
                 );
 
             System.out.println("took " + (System.currentTimeMillis() - millis) + "ms to intersect 100 mil wrapped rectangular prisms");
