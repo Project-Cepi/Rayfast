@@ -66,9 +66,6 @@ object IntersectionUtils {
         } else doubleArrayOf(x, y, z)
     }
 
-    fun isBetweenUnordered(number: Double, compare1: Double, compare2: Double) =
-        number in compare1..compare2
-
     /**
      * Gets the intersections of the specified line with the specified planes
      *
@@ -95,23 +92,18 @@ object IntersectionUtils {
         dirX: Double, dirY: Double, dirZ: Double,  // Direction vector
         // Planes
         vararg planes: DoubleArray
-    ): Array<DoubleArray> {
-        val positions = Array(planes.size) { DoubleArray(3) }
-        for (i in planes.indices) {
-            val plane = planes[i]
+    ) = Array(planes.size) {
+        val plane = planes[it]
 
-            // Get intersection and add to array
-            val position = getIntersection( // Line
-                posX, posY, posZ,
-                dirX, dirY, dirZ,  // Plane
-                plane[0], plane[1], plane[2],
-                plane[3], plane[4], plane[5],
-                plane[6], plane[7], plane[8]
-            )
-            positions[i] = position
-        }
-        return positions
+        getIntersection( // Line
+            posX, posY, posZ,
+            dirX, dirY, dirZ,  // Plane
+            plane[0], plane[1], plane[2],
+            plane[3], plane[4], plane[5],
+            plane[6], plane[7], plane[8]
+        )
     }
+
 
     fun getIntersection( // Line
         posX: Double, posY: Double, posZ: Double,  // Position vector
